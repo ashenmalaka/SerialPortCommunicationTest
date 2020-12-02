@@ -8,7 +8,7 @@ namespace SerialPortCommunicationTest.Data_Reading
 {
     public static class SerialPortProperties
     {
-        public const string PortName = "COM2";
+        public const string PortName = "COM1";
         public const string BaudRate = "9600";
         public const string DataBits = "8";
         public const string StopBits = "One";

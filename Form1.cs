@@ -13,39 +13,36 @@ namespace SerialPortCommunicationTest
 {
     public partial class Form1 : Form
     {
-        private readonly SerialCommunication _serialCommunication;
-        private string _dataIn = "";
-
+        
         public Form1()
         {
             InitializeComponent();
-
-            _serialCommunication = new SerialCommunication();
-            _serialCommunication.InitializeConnection();
-
-            _serialCommunication.DataReceived += SerialCommunication_DataReceived;
-
         }
 
-
-        private void SerialCommunication_DataReceived(byte[] data)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            // get string from byte array 
-            var dataReadingStringIn = Encoding.Default.GetString(data);
-            Console.WriteLine(dataReadingStringIn);
-            
-            DisplayDataReceived(dataReadingStringIn);
+            var serialCommunication = new SerialCommunication();
+            serialCommunication.DataReceived += ProcessData;
         }
 
-        private void DisplayDataReceived(string dataReceived)
+        private void ProcessData(byte[] data)
         {
-            _dataIn += dataReceived;
-            lblDataReading.Text = _dataIn;
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<byte[]>(ProcessData), new object[] { data });
+                return;
+            }
+
+            var processedData = Encoding.Default.GetString(data);
+
+            lblDataReading.Text = processedData;
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            _serialCommunication.SerialPortOpening();
+            
         }
+
+        
     }
 }

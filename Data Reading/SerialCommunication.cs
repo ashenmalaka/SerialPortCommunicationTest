@@ -10,59 +10,65 @@ namespace SerialPortCommunicationTest.Data_Reading
 {
     public class SerialCommunication
     {
-        private readonly SerialPort _serialPort;
-        //public string DataReading { get; set; }
+        private readonly SerialPort mySerialPort;
 
-        public event Action<byte[]> DataReceived;
+        public Action<byte[]> DataReceived;
 
+        //Created the actual serial port in the constructor here, 
+        //as it makes more sense than having the caller need to do it.
+        //you'll also need access to it in the event handler to read the data
         public SerialCommunication()
         {
-            _serialPort = new SerialPort();
+            mySerialPort = new SerialPort
+            {
+                PortName = SerialPortProperties.PortName,
+                BaudRate = Convert.ToInt32(SerialPortProperties.BaudRate),
+                DataBits = Convert.ToInt32(SerialPortProperties.DataBits),
+                StopBits = (StopBits)Enum.Parse((typeof(StopBits)), SerialPortProperties.StopBits),
+                Parity = (Parity)Enum.Parse((typeof(Parity)), SerialPortProperties.Parity),
+
+                RtsEnable = true
+            };
+
+            mySerialPort.DataReceived += mySerialPort_DataReceived;
+
+            try
+            {
+                mySerialPort.Open();
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message);
+            }
         }
 
-        public void InitializeConnection()
-        {
-            _serialPort.PortName = SerialPortProperties.PortName;
-            _serialPort.BaudRate = Convert.ToInt32(SerialPortProperties.BaudRate);
-            _serialPort.DataBits = Convert.ToInt32(SerialPortProperties.DataBits);
-            _serialPort.StopBits = (StopBits)Enum.Parse((typeof(StopBits)), SerialPortProperties.StopBits);
-            _serialPort.Parity = (Parity)Enum.Parse((typeof(Parity)), SerialPortProperties.Parity);
-
-            _serialPort.RtsEnable = true;
-
-            //_serialPort.DataReceived += DataReceivedHandler;
-
-        }
-
-        public void ComPortBufferRead(object sender, SerialDataReceivedEventArgs e)
-        {
-            byte[] inputData = new byte[_serialPort.BytesToRead];
-            _serialPort.Read(inputData, 0, _serialPort.BytesToRead);
-
-            DataReceived?.Invoke(inputData);
-        }
-
-        /*private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
-            DataReading = _serialPort.ReadExisting();
-            //Console.WriteLine(DataReading);
-        }*/
-
-        public void SerialPortOpening()
+        public void mySerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             try
             {
-                _serialPort.Open();
+                //no. of data at the port
+                var byteToRead = mySerialPort.BytesToRead;
+
+                //create array to store buffer data
+                var inputData = new byte[byteToRead];
+
+                //read the data and store
+                mySerialPort.Read(inputData, 0, byteToRead);
+
+                var copy = DataReceived;
+                copy?.Invoke(inputData);
+
             }
-            catch (Exception err)
+            catch (SystemException ex)
             {
-                MessageBox.Show(err.Message, @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, @"Data Received Event");
             }
         }
 
+
         public void SerialPortClosing()
         {
-            _serialPort.Close();
+            mySerialPort.Close();
         }
 
     }
