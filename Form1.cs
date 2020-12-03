@@ -38,11 +38,6 @@ namespace SerialPortCommunicationTest
             lblDataReading.Text = processedData;
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
-        {
-            
-        }
 
-        
     }
 }

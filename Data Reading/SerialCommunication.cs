@@ -19,21 +19,20 @@ namespace SerialPortCommunicationTest.Data_Reading
         //you'll also need access to it in the event handler to read the data
         public SerialCommunication()
         {
-            mySerialPort = new SerialPort
-            {
-                PortName = SerialPortProperties.PortName,
-                BaudRate = Convert.ToInt32(SerialPortProperties.BaudRate),
-                DataBits = Convert.ToInt32(SerialPortProperties.DataBits),
-                StopBits = (StopBits)Enum.Parse((typeof(StopBits)), SerialPortProperties.StopBits),
-                Parity = (Parity)Enum.Parse((typeof(Parity)), SerialPortProperties.Parity),
-
-                RtsEnable = true
-            };
-
-            mySerialPort.DataReceived += mySerialPort_DataReceived;
-
             try
-            {
+            { 
+                mySerialPort = new SerialPort
+                {
+                    PortName = SerialPortProperties.PortName,
+                    BaudRate = Convert.ToInt32(SerialPortProperties.BaudRate),
+                    DataBits = Convert.ToInt32(SerialPortProperties.DataBits),
+                    StopBits = (StopBits)Enum.Parse((typeof(StopBits)), SerialPortProperties.StopBits),
+                    Parity = (Parity)Enum.Parse((typeof(Parity)), SerialPortProperties.Parity),
+                    Handshake = Handshake.None,
+                    RtsEnable = true
+                };
+
+                mySerialPort.DataReceived += mySerialPort_DataReceived;
                 mySerialPort.Open();
             }
             catch (Exception error)
