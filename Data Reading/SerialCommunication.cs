@@ -68,7 +68,15 @@ namespace SerialPortCommunicationTest.Data_Reading
 
         public void SerialPortClosing()
         {
-            mySerialPort.Close();
+            if (mySerialPort.IsOpen)
+            {
+                mySerialPort.Close();
+            }
+            else
+            {
+                MessageBox.Show(@"Serial port is not opened...");
+            }
+            
         }
 
     }
